@@ -75,7 +75,7 @@ do
 			echo -e "you will need to transfer this password to the clients later"
 			echo -e -n "\e[1;32mPassword >>\e[m "
 			read -r -e PASS
-			echo -e $PASS >> $DIRMAIN/gpg/pass
+			echo -e $PASS > $DIRMAIN/gpg/pass
 		;;
 		help)
 			echo -e ""
