@@ -1,0 +1,11 @@
+
+# Server config
+
+HOST="127.0.0.1"
+OPORT="1234"
+IPORT="1235"
+COMPORT="1236"
+
+# User config
+
+NAME="User"
