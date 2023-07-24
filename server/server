@@ -1,0 +1,98 @@
+#!/bin/bash
+export DIRMAIN=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" && pwd )
+source $DIRMAIN/config
+
+printf "\e[?1049h"
+clear
+
+echo -e ""
+echo -e "     \e[3mBerzelius\e[m"
+echo -e "        SRV"
+echo -e "    by Tina_lel   \n"
+
+mkdir -p $DIRMAIN/chat
+mkdir -p $DIRMAIN/calls
+mkdir -p $DIRMAIN/gpg
+touch $DIRMAIN/chat/main
+touch $DIRMAIN/calls/send
+
+# FUNCTIONS
+
+ENCRYPT_MAIN() {
+	gpg -c --cipher-algo AES256 --batch --yes --passphrase-file $DIRMAIN/gpg/pass $DIRMAIN/chat/main > /dev/null 2>&1
+}
+
+while :
+do
+	printf "\e[1;34mBerzelius SRV >>\e[m "
+	read -r -e MAIN
+	case $MAIN in
+		start)
+			if [[ ! -f $DIRMAIN/gpg/pass ]];
+			then
+				echo -e "you need to run the \"pass\" command first, to set an encryption password"
+			else
+				echo -e "starting server..."
+				if [[ ! -f "$DIRMAIN/chat/main.gpg" ]]
+				then
+					ENCRYPT_MAIN
+				fi
+
+				# OUTPUT
+				socat -U tcp-l:$OPORT,fork,reuseaddr,reuseport open:"$DIRMAIN/chat/main.gpg" &
+
+				# INPUT
+				while :
+				do
+					socat -u tcp-l:$IPORT,reuseaddr,reuseport open:"$DIRMAIN/calls/tmp.gpg",creat || break
+					date "+%T | %d.%m.%Y" >> $DIRMAIN/chat/main
+					gpg -q -d --cipher-algo AES256 --batch --yes --passphrase-file $DIRMAIN/gpg/pass $DIRMAIN/calls/tmp.gpg >> $DIRMAIN/chat/main
+					echo -e "------------" >> $DIRMAIN/chat/main
+					rm "$DIRMAIN/calls/tmp.gpg"
+					ENCRYPT_MAIN
+					while :
+					do
+						socat tcp-l:$COMPORT,reuseaddr,reuseport,fork open:"$DIRMAIN/calls/send" &
+						SOCAT_PID=$!
+						sleep 1
+						kill $SOCAT_PID
+						break
+					done &
+				done &
+			fi
+		;;
+		stop)
+			echo -e "killing the server..."
+			killall "socat" > /dev/null 2>&1
+		;;
+		exit)
+			killall "socat" > /dev/null 2>&1
+			printf "\e[?1049l"
+			exit
+		;;
+		pass)
+			echo -e "set a password for encryption and decryption"
+			echo -e "you will need to transfer this password to the clients later"
+			echo -e -n "\e[1;32mPassword >>\e[m "
+			read -r -e PASS
+			echo -e $PASS >> $DIRMAIN/gpg/pass
+		;;
+		help)
+			echo -e ""
+			echo -e " List of commands:"
+			echo -e " -----------------"
+			echo -e " help: show this message"
+			echo -e " pass: set encryption password"
+			echo -e " start: start the server"
+			echo -e " stop: stop the server"
+			echo -e " exit: exit the programm"
+			echo -e " -----------------"
+			echo -e ""
+		;;
+		"")
+		;;
+		*)
+			echo -e "Unknown command (use \"help\" for a list of commands)"
+		;;
+	esac
+done

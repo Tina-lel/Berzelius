@@ -1,0 +1,4 @@
+
+OPORT="1234"    # TCP
+IPORT="1235"    # TCP
+COMPORT="1236"  # TCP
