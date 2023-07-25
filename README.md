@@ -57,16 +57,19 @@ cd Berzelius/client/
 chmod +x client
 ```
 
-open up "config" in a text editor and change the "NAME" var to a name of your choice. next edit the "HOST", "OPORT", "IPORT" and "COMPORT" variable, to point to a machine running the "server" script, on the same ports
+open up "config" in a text editor and edit the "example" server function to point to a machine running the server script on the same ports. you can add as many server functions as you'd like.
 
 ```
 ./client
 ```
+
+enter a server function name (a name before the "()" in the config)
+
 enter the server's password
 
 if the server was running, and everything went fine, you should now see a blank screen, with a little arrow.
 
-in order to chat, type something and press enter. type "!exit" to disconnect and exit
+in order to chat, type something and press enter. type "!q" to disconnect and exit (CTRL+C also works)
 
 Commands:
 -
@@ -82,3 +85,13 @@ start: start the server
 stop: kill the server
 
 exit: exit the script
+
+### client (in chat):
+
+!help / !h (help message)
+
+!scroll / !s (view chat history)
+
+!back / !b (disconnect and return)
+
+!quit / !q (disconnect and exit)
