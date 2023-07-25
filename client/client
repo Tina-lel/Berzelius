@@ -1,0 +1,127 @@
+#!/bin/bash
+export DIRMAIN=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" && pwd )
+source $DIRMAIN/config
+
+printf "\e[?1049h"
+clear
+
+mkdir -p "$DIRMAIN/calls"
+mkdir -p "$DIRMAIN/tmp"
+
+# FUNCTIONS
+CHAT_GET() {
+	socat -u tcp:$HOST:$OPORT - | gpg -q -d -o "$DIRMAIN/tmp/main" --cipher-algo AES256 --batch --yes --passphrase $PASS -
+	clear
+	cat "$DIRMAIN/tmp/main" | xargs --null echo -e
+	rm "$DIRMAIN/tmp/main"
+	printf " --> "
+}
+CHAT_GET_FILE() {
+	socat -u tcp:$HOST:$OPORT - | gpg -q -d -o "$DIRMAIN/tmp/main" --cipher-algo AES256 --batch --yes --passphrase $PASS -
+}
+WAIT_LOOP() {
+	while :
+	do
+		socat tcp:$HOST:$COMPORT,forever - || break
+		CHAT_GET
+		sleep 1
+	done &
+	LOOP_PID=$!
+}
+JOIN_MESSAGE() {
+	echo " >> \e[3mUser $NAME_COLOR$NAME\e[m\e[3m has joined the chat\e[m << " | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
+}
+LEAVE_MESSAGE() {
+	echo " << \e[3mUser $NAME_COLOR$NAME\e[m\e[3m has left the chat\e[m >> " | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
+}
+LOGO() {
+	echo -e ""
+	echo -e "     \e[3mBerzelius\e[m"
+	echo -e "    by Tina_lel   \n"
+}
+EXITER() {
+	LEAVE_MESSAGE
+	killall "socat" > /dev/null 2>&1
+	kill $LOOP_PID
+	printf "\e[?1049l"
+	exit
+}
+
+# TRAPS
+trap "EXITER" SIGINT
+
+LOGO
+
+while :
+do
+	echo -e "What server to join? (Function name required)"
+	while :
+	do
+		echo -n -e "\e[1;35mServer >>\e[m "
+		read -r -e SERVER_SELECT
+		$SERVER_SELECT > /dev/null 2>&1
+		if [[ $? != "0" ]] || [[ $SERVER_SELECT == "" ]];
+		then
+			echo -e ""
+			echo -e "No such server Function in the config file."
+			echo -e "You need to enter a Function name (aka. one of the names before the \"()\" in the \"Server config\" part of the config file)"
+			echo -e "This exists for easy switching between different servers"
+			echo -e ""
+		else
+			break
+		fi
+	done
+
+	echo -e "Enter encryption password for $HOST"
+	echo -e -n "\e[1;32mPassword >>\e[m "
+	read -s -r -e PASS
+
+	JOIN_MESSAGE
+	WAIT_LOOP
+	CHAT_GET
+	while :
+	do
+		read -r -e MSG
+		case $MSG in
+		!quit | !q)
+			EXITER
+		;;
+		!back | !b)
+			clear
+			LEAVE_MESSAGE
+			killall "socat" > /dev/null 2>&1
+			kill $LOOP_PID
+			LOGO
+			break
+		;;
+		!scroll | !s)
+			killall "socat" > /dev/null 2>&1
+			kill $LOOP_PID
+			CHAT_GET_FILE
+			less $DIRMAIN/tmp/main
+			WAIT_LOOP
+			CHAT_GET
+		;;
+		!help | !h)
+			killall "socat" > /dev/null 2>&1
+			kill $LOOP_PID
+			clear
+			echo -e "\n List of commands:"
+			echo -e " -----------------"
+			echo -e " \"!help\"	| \"!h\" (show this message)"
+			echo -e " \"!scroll\"	| \"!s\" (view chat history)"
+			echo -e " \"!back\"	| \"!b\" (disconnect and return)"
+			echo -e " \"!quit\"	| \"!q\" (disconnect and exit)"
+			echo -e " -----------------\n"
+			echo -e -n " Press Enter to return."
+			read
+			WAIT_LOOP
+			CHAT_GET
+		;;
+		*)
+			echo -e -n " Sending... "
+			echo "$NAME_COLOR$NAME\e[m: $MSG" | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
+		;;
+		esac
+	done
+done
