@@ -57,13 +57,13 @@ cd Berzelius/client/
 chmod +x client
 ```
 
-open up "config" in a text editor and edit the "example" server function to point to a machine running the server script on the same ports. you can add as many server functions as you'd like.
+open up "config" in a text editor and edit the "example" server function to point to a machine running the server script on the same ports, if you changed the function name or added new ones, you additionally need to edit the array at the top with the new names (seperated by spaces). you can add as many server functions as you'd like.
 
 ```
 ./client
 ```
 
-enter a server function name (a name before the "()" in the config)
+select a server with the keybinds set in the config (defaults are UP=w DOWN=s QUIT=q)
 
 enter the server's password
 
