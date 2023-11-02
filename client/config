@@ -1,0 +1,27 @@
+# Server config
+
+FUNCS=( example )
+
+example() {
+	HOST="127.0.0.1"
+	OPORT="1234"
+	IPORT="1235"
+	COMPORT="1236"
+}
+
+### SERVER CONFIG README:
+# You can add more servers to choose from when starting the client.
+# Simply copy the "example" function above, replace "example" with any name
+# and fill out all the info, then add the function name to the array "FUNCS" above.
+# You can have as many servers as you'd like.
+# Then just select it in the client when it prompts you.
+###
+
+# User config
+NAME="User"
+NAME_COLOR="\e[1;34m"	# this is blue. you can google the bash color codes, and drop one in that looks like this one, if you dont like blue.
+
+# Keybinds (currently only for the server selector)
+UP="w"
+DOWN="s"
+QUIT="q"
