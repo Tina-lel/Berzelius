@@ -92,6 +92,8 @@ exit: exit the script
 
 !scroll / !s (view chat history)
 
+!color / !c (pick message color)
+
 !back / !b (disconnect and return)
 
 !quit / !q (disconnect and exit)
