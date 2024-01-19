@@ -196,12 +196,20 @@ do
 			echo -e " \"!scroll\"	| \"!s\" (view chat history)"
 			echo -e " \"!color\"	| \"!c\" (pick message color)"
 			echo -e " \"!back\"	| \"!b\" (disconnect and return)"
+			echo -e " \"!neofetch\"	| \"!n\" (send neofetch)"
+			echo -e " \"!refresh\"	| \"!r\" (refresh chat)"
 			echo -e " \"!quit\"	| \"!q\" (disconnect and exit)"
 			echo -e " -----------------\n"
 			echo -e -n " Press Enter to return."
 			read
 			WAIT_LOOP
 			CHAT_GET
+		;;
+		!neofetch | !n)
+			echo "$NAME_COLOR$NAME:\n$(neofetch)" | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
+		;;
+		!refresh | !r)
+		CHAT_GET
 		;;
 		*)
 			echo -e -n "Sending... "
