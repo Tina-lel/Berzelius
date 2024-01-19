@@ -10,7 +10,8 @@ mkdir -p "$DIRMAIN/tmp"
 CHAT_GET() {
 	socat -u tcp:$HOST:$OPORT - | gpg -q -d -o "$DIRMAIN/tmp/main" --cipher-algo AES256 --batch --yes --passphrase $PASS -
 	clear
-	cat "$DIRMAIN/tmp/main" | xargs --null echo -e
+	#cat "$DIRMAIN/tmp/main" | xargs --null echo -e
+	echo -e "$(cat $DIRMAIN/tmp/main)"
 	rm "$DIRMAIN/tmp/main"
 }
 WAIT_LOOP() {
