@@ -209,7 +209,7 @@ do
 			echo "$NAME_COLOR$NAME:\n$(neofetch)" | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
 		;;
 		!refresh | !r)
-		CHAT_GET
+			CHAT_GET
 		;;
 		*)
 			echo -e -n "Sending... "
