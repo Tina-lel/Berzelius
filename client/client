@@ -206,7 +206,7 @@ do
 			CHAT_GET
 		;;
 		!neofetch | !n)
-			echo "$NAME_COLOR$NAME:\n$(neofetch)" | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
+			echo "$NAME_COLOR$NAME\e[m:\n$(neofetch)" | gpg -c --cipher-algo AES256 --batch --yes --passphrase $PASS - | socat -U tcp:$HOST:$IPORT -
 		;;
 		!refresh | !r)
 			CHAT_GET
