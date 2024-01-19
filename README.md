@@ -94,6 +94,10 @@ exit: exit the script
 
 !color / !c (pick message color)
 
+!neofetch / !n (send neofetch)
+
+!refresh / !r (refresh chat)"
+
 !back / !b (disconnect and return)
 
 !quit / !q (disconnect and exit)
